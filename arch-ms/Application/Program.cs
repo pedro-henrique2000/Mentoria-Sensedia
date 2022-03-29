@@ -1,6 +1,8 @@
+using Application.AdapterInbound.Rest.Filter;
 using Application.Configs;
 using Domain.Services;
 using Domain.Services.Interfaces;
+using FluentValidation.AspNetCore;
 using Infrastructure.Database.Config;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +21,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<MongoDbConfig>(builder.Configuration.GetSection("MongoDb"));
 builder.Services.AddSingleton<ITodoService, TodoService>();
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+}).AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Program>());
 
 var app = builder.Build();
 

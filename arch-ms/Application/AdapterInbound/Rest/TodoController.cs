@@ -1,8 +1,10 @@
-﻿using Domain.Common;
+﻿using Application.AdapterInbound.Rest.Validators;
+using Domain.Common;
 using Domain.Entities;
 using Domain.Entities.Common;
 using Domain.Services;
 using Domain.Services.Interfaces;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.AdapterInbound.Rest
@@ -19,12 +21,32 @@ namespace Application.AdapterInbound.Rest
         }
 
         [HttpPost]
-        public async Task<ActionResult<Todo>> Post([FromBody] Todo todo)
+        public async Task<ActionResult<Todo>> Post([FromBody] TodoRequest todoRequest)
         {
-            todo.Audit = new Audit("Julio Oliveira");
-            await _service.Create(todo);
+            TodoRequestValidator validator = new();
 
-            return CreatedAtAction(nameof(Post), todo);
+            ValidationResult validationResult = validator.Validate(todoRequest);
+
+            if (!validationResult.IsValid)
+            {
+                foreach (var failure in validationResult.Errors)
+                {
+                    Console.WriteLine("Property " + failure.PropertyName + " failed validation. Error Message was: " + failure.ErrorMessage + " Error Code was: " + failure.ErrorCode);
+                }
+            }
+
+            Todo todo = new()
+            {
+                Name = todoRequest.Name,
+                Email = todoRequest.Email,
+                Audit = new Audit("Julio Oliveira")
+            };
+
+            //await _service.Create(todo);
+
+            //return CreatedAtAction(nameof(Post), todo);
+
+            return Ok(todo);
         }
 
         [HttpGet("{id}")]
