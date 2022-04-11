@@ -9,6 +9,10 @@ namespace Domain.Services
     public class TodoService : ITodoService
     {
         private readonly IMongoCollection<Todo> _service;
+
+        public TodoService()
+        {
+        }
         public TodoService(IOptions<MongoDbConfig> options)
         {
             var mongoDb = new MongoClient(options.Value.ConnectionString);

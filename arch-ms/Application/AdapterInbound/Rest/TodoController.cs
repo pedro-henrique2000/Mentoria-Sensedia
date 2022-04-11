@@ -18,6 +18,10 @@ namespace Application.AdapterInbound.Rest
             _service = todoService;
         }
 
+        public TodoController()
+        {
+        }
+
         [HttpPost]
         public async Task<ActionResult<Todo>> Post([FromBody] Todo todo)
         {
@@ -28,9 +32,14 @@ namespace Application.AdapterInbound.Rest
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Todo>> Get(string id)
+        public async Task<ActionResult<Todo>> Get(TodoService @object, string id)
         {
             var todo = await _service.GetById(id);
+
+            if (todo is null)
+            {
+                return NotFound();
+            }
 
             return Ok(todo);
         }
